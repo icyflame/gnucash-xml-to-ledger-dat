@@ -6,8 +6,12 @@ use XML::Simple;
 # dev + debug
 use Data::Dumper;
 
+my $input_file = shift;
+if (!$input_file) {
+    die "Must provide input file name: perl script.pl input.xml"
+}
 
-my $parsed = XMLin("input.gnucash", ForceArray => [ "trn:split" ]);
+my $parsed = XMLin($input_file, ForceArray => [ "trn:split" ]);
 
 my @accounts_list = @{$parsed->{'gnc:book'}->{'gnc:account'}};
 
