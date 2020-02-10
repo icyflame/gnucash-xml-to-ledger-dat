@@ -60,12 +60,17 @@ while (my $transaction = shift(@transactions)) {
 
     while (my $split = shift(@splits)) {
         my $quantity = eval($split->{'split:quantity'});
+
         my $account = $accounts_map{$split->{'split:account'}->{'content'}};
         my $account_name = get_account_name ($account);
+        my $commodity = $account->{'act:commodity'}->{'cmdty:id'};
+        $commodity =~ s/(^\d)/S\1/g;
+        $commodity =~ s/://g;
+        $commodity =~ s/\d//g;
 
         print "\t" . join("\t",
             $account_name,
-            $account->{'act:commodity'}->{'cmdty:id'},
+            $commodity,
             $quantity,
         );
         print "\n";
