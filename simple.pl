@@ -7,7 +7,7 @@ use XML::Simple;
 use Data::Dumper;
 
 
-my $parsed = XMLin("input.gnucash");
+my $parsed = XMLin("input.gnucash", ForceArray => [ "trn:split" ]);
 
 my @accounts_list = @{$parsed->{'gnc:book'}->{'gnc:account'}};
 
@@ -29,10 +29,10 @@ sub get_account_name {
         return $base;
     }
 
-    my $this = sprintf ("%s:%s", $type, $name);
+    my $this = sprintf ("%s", $name);
     if (defined $base && $base ne "") {
         # Recurse
-        $this = sprintf ("%s:%s:%s", $type, $name, $base);
+        $this = sprintf ("%s:%s", $this, $base);
     }
 
     if (exists $act->{'act:parent'}) {
@@ -48,8 +48,14 @@ my @transactions = @{$parsed->{'gnc:book'}->{'gnc:transaction'}};
 
 while (my $transaction = shift(@transactions)) {
     my $date = substr($transaction->{'trn:date-posted'}->{'ts:date'}, 0, 10);
-    my $description = $transaction->{'trn:description'} . "";
+    my $description = sprintf("%s", $transaction->{'trn:description'});
     my $id = $transaction->{'trn:id'}->{'content'};
+
+    # When description is empty, it looks like this after conversion to a string
+    if ($description =~ /HASH\(0x[0-9a-f]+\)/) {
+        $description = "Empty description ($id)";
+    }
+
     my @splits = @{$transaction->{'trn:splits'}->{'trn:split'}};
 
     if (@splits == 0) {
