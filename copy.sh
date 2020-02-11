@@ -11,7 +11,7 @@ rm -f input.xml && \
     cp "$GNUCASH_FILE" input.xml.gz && \
     gzip -d input.xml.gz && \
     rm -f simple.dat && \
-    perl simple.pl input.xml 4385 MERC > simple.dat && \
+    perl convert.pl input.xml 4385 MERC > simple.dat && \
     rm input.xml
 
 if [[ -f "commodities.dat" ]]; then

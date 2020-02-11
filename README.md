@@ -2,6 +2,13 @@
 
 > A script to convert GNUCash's XML file to Ledger's dat file
 
+[convert.pl](./convert.pl) is the script to convert GnuCash's uncompressed XML
+file to a Ledger journal. I run it using Perl 5.26 on a computer running Ubuntu
+18.04.
+
+The file formats for ledger and hledger are very similar, I have been able to
+generate repors using hledger for the dat file created by the conversion script.
+
 **Note:** There are [other scripts][1] which do the same thing as the Perl
 script in this repository.
 
