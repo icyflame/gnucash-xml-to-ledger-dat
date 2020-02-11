@@ -19,7 +19,7 @@ ledger () {
 }
 ```
 
-### Display numbers with the correct format
+### Display numbers in the correct format
 
 Commodity directives can be used to ensure that numbers are always displayed in
 the appropriate format.
@@ -50,5 +50,11 @@ hledger -f simple.dat cashflow
 # commodities.dat file
 hledger -f simple.dat bal Assets -Y --value=now,USD
 ```
+
+## License
+
+Code in this repository is licensed under MIT.
+
+Copyright (C) 2020  Siddharth Kannan <mail@siddharthkannan.in>
 
 [1]: https://gist.github.com/nonducor/ddc97e787810d52d067206a592a35ea7
