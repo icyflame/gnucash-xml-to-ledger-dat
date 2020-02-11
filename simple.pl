@@ -8,7 +8,32 @@ use Data::Dumper;
 
 my $input_file = shift;
 if (!$input_file) {
-    die "Must provide input file name: perl script.pl input.xml"
+    die "Must provide input file name: perl script.pl input.xml [sub repl]"
+}
+
+if ($input_file eq "--help" || $input_file eq "-h") {
+    print "
+perl script.pl input.xml [sub repl] [sub repl]
+
+input.xml is the GnuCash XML file (after gzip decompression)
+
+[sub repl] pairs are pairs of regular expressions which will be used to
+change the name of the commodity. The transformation s/sub/repl/g will
+be run on every single commodity name. You can use this to remove digits
+from the commodity name, or change values to readable values.
+
+Eg: To convert AAPL => Apple, you can use this command:
+
+    perl script.pl input.xml AAPL Apple
+";
+
+    exit 0;
+}
+
+my @replacements;
+while (my $sub = shift) {
+    my $repl = shift;
+    push(@replacements, ($sub, $repl))
 }
 
 my $parsed = XMLin($input_file, ForceArray => [ "trn:split" ]);
