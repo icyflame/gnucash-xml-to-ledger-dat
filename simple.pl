@@ -21,6 +21,15 @@ while (my $account = shift(@accounts_list)) {
     $accounts_map{$account->{'act:id'}->{'content'}} = $account;
 }
 
+sub fix_commodity_name {
+    my $base = shift;
+    for (my $i = 0; $i < @replacements; $i++) {
+        my $replacements = @replacements[$i];
+        $base =~ s/$replacements[0]/$replacements[1]/g;
+    }
+    return $base;
+}
+
 sub get_account_name {
     my $act = shift;
     my $base = shift;
@@ -66,7 +75,7 @@ while (my $transaction = shift(@transactions)) {
         continue
     }
 
-    printf ("%s\t%s\n", $date, $description eq "" ? "Empty description ($id)" : $description);
+    printf ("%s  %s\n", $date, $description eq "" ? "Empty description ($id)" : $description);
 
     while (my $split = shift(@splits)) {
         my $quantity = eval($split->{'split:quantity'});
@@ -74,11 +83,12 @@ while (my $transaction = shift(@transactions)) {
         my $account = $accounts_map{$split->{'split:account'}->{'content'}};
         my $account_name = get_account_name ($account);
         my $commodity = $account->{'act:commodity'}->{'cmdty:id'};
-        $commodity =~ s/(^\d)/S\1/g;
-        $commodity =~ s/://g;
-        $commodity =~ s/\d//g;
+        $commodity =~ s/(^\d)/S_\1/g;
+        $commodity =~ s/:/_/g;
 
-        print "\t" . join("\t",
+        $commodity = fix_commodity_name $commodity;
+
+        print "  " . join("  ",
             $account_name,
             $commodity,
             $quantity,
