@@ -42,6 +42,8 @@ while (my $sub = shift) {
     push(@replacements, ($sub, $repl))
 }
 
+print STDERR Dumper \@replacements;
+
 my $parsed = XMLin($input_file, ForceArray => [ "trn:split" ]);
 
 my @accounts_list = @{$parsed->{'gnc:book'}->{'gnc:account'}};
@@ -54,9 +56,8 @@ while (my $account = shift(@accounts_list)) {
 
 sub fix_commodity_name {
     my $base = shift;
-    for (my $i = 0; $i < @replacements; $i++) {
-        my $replacements = @replacements[$i];
-        $base =~ s/$replacements[0]/$replacements[1]/g;
+    for (my $i = 0; $i < @replacements; $i += 2) {
+        $base =~ s/$replacements[$i]/$replacements[$i+1]/g;
     }
     return $base;
 }
