@@ -12,17 +12,38 @@ generate repors using hledger for the dat file created by the conversion script.
 **Note:** There are [other scripts][1] which do the same thing as the Perl
 script in this repository.
 
+## Usage
+
+`convert.pl` requires the Perl module `XML::Simple` as a dependency. This script can be run without
+installing anything using Docker:
+
+``` sh
+# Build the Docker image using the included Dockerfile
+$ docker build . -t $(basename $(pwd))
+
+# Use the built Docker image to run the conversion command
+$ docker run --name 'gnucash-xml-to-ledger-dat' \
+  -it --rm \
+  --volume "$GNUCASH_FILE:/input.gnucash:ro" \
+  --volume /tmp:/output:rw \
+  -w /src $(basename $(pwd)) /input.gnucash /output/output.dat
+```
+
 ## Recipes
 
 ### Don't install anything
 
+These oneliners will run Ledger with a read-only file system connected to the
+current working directory. The read-only file system ensures that the container
+can not change any of the files that are in the current working directory.
+
 ```sh
 hledger () {
-        docker run --rm -v `pwd`:/data -w /data dastapov/hledger hledger $@
+        docker run --rm --volume $(pwd):/data:ro -w /data dastapov/hledger hledger $@
 }
 
 ledger () {
-        docker run --rm -v `pwd`:/data -w /data dcycle/ledger:1 $@
+        docker run --rm --volume $(pwd):/data:ro -w /data dcycle/ledger:1 $@
 }
 ```
 
