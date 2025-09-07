@@ -29,6 +29,19 @@ $ docker run --name 'gnucash-xml-to-ledger-dat' \
   -w /src $(basename $(pwd)) /input.gnucash /output/output.dat
 ```
 
+## Testing
+
+When making changes to the script, confirm that the changes that are made in the TestData are
+logical.
+
+``` shell
+# Convert "./TestData/TestBook-GnuCash/TestBook.gnucash" into a Ledger file
+
+# Confirm that actual and expected are identical
+$ diff /tmp/actual.dat ./TestData/TestBook-Ledger/TestBook.ledger.dat
+
+```
+
 ## Recipes
 
 ### Don't install anything
