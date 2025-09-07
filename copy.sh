@@ -41,8 +41,6 @@ rm -vf input.xml && \
     perl ${CWD}/convert.pl input.xml > $OUTPUT_FILE && \
     rm -fv input.xml
 
-# Replacements: 4385.T MERC 9202.T ANA 8604.T NOMURA 7453.T MUJI 7976.T UNI
-
 if [[ -f "${CWD}/commodities.dat" ]]; then
     cat "${CWD}/commodities.dat" >> $OUTPUT_FILE
 fi
