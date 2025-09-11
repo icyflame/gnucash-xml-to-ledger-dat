@@ -125,6 +125,9 @@ while (my $transaction = shift(@transactions)) {
             $quantity,
         );
         print "\n";
+
+        # TODO: Include the second line from the transaction as a comment in the output Ledger file
+        # (The second line is visible when the Double line view is enabled in GnuCash)
     }
 
     print "\n";
