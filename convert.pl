@@ -73,6 +73,7 @@ while (my $transaction = shift(@transactions)) {
     my $date = substr($transaction->{'trn:date-posted'}->{'ts:date'}, 0, 10);
     my $description = sprintf("%s", $transaction->{'trn:description'});
     my $id = $transaction->{'trn:id'}->{'content'};
+    my $transaction_commodity = $transaction->{'trn:currency'}->{'cmdty:id'};
 
     # When description is empty, it looks like this after conversion to a string
     if ($description =~ /HASH\(0x[0-9a-f]+\)/) {
@@ -94,16 +95,30 @@ while (my $transaction = shift(@transactions)) {
         my $account_name = get_account_name ($account);
         my $commodity = $account->{'act:commodity'}->{'cmdty:id'};
 
+        my $split_amount = $quantity;
 
-		# Commodity names can have any character (including white space) if they are enclosed in double quotes.
-		#
-		# See section 4.5.1 Naming Commodities in the Ledger manual: https://ledger-cli.org/doc/ledger3.pdf
-		$commodity = '"' . $commodity . '"';
+        # Bug: In a Stock purchase transaction, the "Edit Exchange Rate" dialog is not shown by
+        # GnuCash. This seems to be a limitation within the program. If the quantity for a
+        # transaction is zero, then it should attempt to use "split:value" instead. If that is zero
+        # too, then this split is a no-op and does not need to be included in the resulting Ledger
+        # file.  However, for correctness, I *will* include the "0 COMMODITY" split in the output
+        # Ledger file.
 
-		# TODO: For Stock purchases and sales, this should also have the price at which stocks were
-		# purchased, which will make it possible to use Ledger.
-		#
-		# See 4.5.2 Buying and Selling Stock in the Ledger manual: https://ledger-cli.org/doc/ledger3.pdf
+        my $value = eval($split->{'split:value'});
+        if ($quantity == 0 && $value != 0) {
+            $split_amount = $value;
+            $commodity = $transaction_commodity;
+        }
+
+        # Commodity names can have any character (including white space) if they are enclosed in double quotes.
+        #
+        # See section 4.5.1 Naming Commodities in the Ledger manual: https://ledger-cli.org/doc/ledger3.pdf
+        $commodity = '"' . $commodity . '"';
+
+        # TODO: For Stock purchases and sales, this should also have the price at which stocks were
+        # purchased, which will make it possible to use Ledger.
+        #
+        # See 4.5.2 Buying and Selling Stock in the Ledger manual: https://ledger-cli.org/doc/ledger3.pdf
         print "  " . join("  ",
             $account_name,
             $commodity,
