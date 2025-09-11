@@ -24,6 +24,7 @@ $ docker build . -t $(basename $(pwd))
 # Use the built Docker image to run the conversion command
 $ docker run --name 'gnucash-xml-to-ledger-dat' \
   -it --rm \
+  --user 1000:1000 \
   --volume "$GNUCASH_FILE:/input.gnucash:ro" \
   --volume /tmp:/output:rw \
   -w /src $(basename $(pwd)) /input.gnucash /output/output.dat
