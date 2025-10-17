@@ -89,13 +89,10 @@ while (my $transaction = shift(@transactions)) {
     printf ("%s  %s\n", $date, $description eq "" ? "Empty description ($id)" : $description);
 
     while (my $split = shift(@splits)) {
-        my $quantity = eval($split->{'split:quantity'});
 
         my $account = $accounts_map{$split->{'split:account'}->{'content'}};
         my $account_name = get_account_name ($account);
         my $commodity = $account->{'act:commodity'}->{'cmdty:id'};
-
-        my $split_amount = $quantity;
 
         # Bug: In a Stock purchase transaction, the "Edit Exchange Rate" dialog is not shown by
         # GnuCash. This seems to be a limitation within the program. If the quantity for a
@@ -104,7 +101,11 @@ while (my $transaction = shift(@transactions)) {
         # file.  However, for correctness, I *will* include the "0 COMMODITY" split in the output
         # Ledger file.
 
+        my $quantity = eval($split->{'split:quantity'});
+        my $split_amount = $quantity;
+
         my $value = eval($split->{'split:value'});
+		print STDERR "$account_name, $quantity, $value\n";
         if ($quantity == 0 && $value != 0) {
             $split_amount = $value;
             $commodity = $transaction_commodity;
@@ -122,7 +123,7 @@ while (my $transaction = shift(@transactions)) {
         print "  " . join("  ",
             $account_name,
             $commodity,
-            $quantity,
+            $split_amount,
         );
         print "\n";
 
