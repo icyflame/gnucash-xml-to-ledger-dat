@@ -118,17 +118,22 @@ func (p *Parser) GetAccount(accountID string) *Account {
 
 func ParseFraction(fraction string) float64 {
 	parts := strings.Split(fraction, "/")
-	if len(parts) != 2 {
+
+	if len(parts) == 1 {
 		val, _ := strconv.ParseFloat(fraction, 64)
 		return val
 	}
 
-	numerator, _ := strconv.ParseFloat(parts[0], 64)
-	denominator, _ := strconv.ParseFloat(parts[1], 64)
+	if len(parts) == 2 {
+		numerator, _ := strconv.ParseFloat(parts[0], 64)
+		denominator, _ := strconv.ParseFloat(parts[1], 64)
 
-	if denominator == 0 {
-		return 0
+		if denominator == 0 {
+			return 0
+		}
+
+		return numerator / denominator
 	}
 
-	return numerator / denominator
+	panic(fmt.Sprintf("invalid fraction format: %s (has %d parts)", fraction, len(parts)))
 }
