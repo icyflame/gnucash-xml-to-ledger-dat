@@ -23,26 +23,12 @@ fi
 
 OUTPUT_FILE="$2"
 if [[ -z "$OUTPUT_FILE" ]]; then
-    OUTPUT_FILE=$(pwd)/output.dat;
-fi
-
-if [[ -f "$OUTPUT_FILE" ]]; then
-    echo "ERROR: Output file must not already exist." >&2
+    echo "ERROR: Output file must be specified" >&2
     usage
-    exit 43
+    exit 44
 fi
 
-CWD=$(pwd)
-pushd /tmp
-
-rm -vf input.xml && \
-    cp -v "$GNUCASH_FILE" input.xml.gz && \
-    gzip -d input.xml.gz && \
-    perl ${CWD}/convert.pl input.xml > $OUTPUT_FILE && \
-    rm -fv input.xml
-
-if [[ -f "${CWD}/commodities.dat" ]]; then
-    cat "${CWD}/commodities.dat" >> $OUTPUT_FILE
-fi
-
-popd
+cp -v "$GNUCASH_FILE" /tmp/input.xml.gz && \
+    gzip -d /tmp/input.xml.gz && \
+    perl /src/convert.pl /tmp/input.xml > $OUTPUT_FILE && \
+    rm -fv /tmp/input.xml

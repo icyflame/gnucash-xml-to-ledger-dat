@@ -2,4 +2,4 @@
 *.ledger
 *.gnucash
 *.xml
-prices.db
+*.db

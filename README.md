@@ -28,6 +28,13 @@ $ docker run --name 'gnucash-xml-to-ledger-dat' \
   --volume "$GNUCASH_FILE:/input.gnucash:ro" \
   --volume /tmp:/output:rw \
   -w /src $(basename $(pwd)) /input.gnucash /output/output.dat
+
+$ docker run --name 'gnucash-xml-to-ledger-dat' \
+  -it --rm \
+  --user 1000:1000 \
+  --volume "$GNUCASH_FILE:/input.gnucash:ro" \
+  --volume "./output:/output:rw" \
+  -w /src $(basename $(pwd)) /input.gnucash /output/output.dat
 ```
 
 ## Testing
