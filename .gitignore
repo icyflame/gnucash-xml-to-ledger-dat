@@ -3,3 +3,5 @@
 *.gnucash
 *.xml
 *.db
+input/
+output/
