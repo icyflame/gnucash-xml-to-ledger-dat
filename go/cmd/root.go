@@ -9,6 +9,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// TODO: Don't use a global variable for this flag. It can be passed down to the parsers, and other
+// objects which are created.
 var verbose bool
 
 var rootCmd = &cobra.Command{
