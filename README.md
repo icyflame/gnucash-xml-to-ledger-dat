@@ -1,11 +1,11 @@
-# GNUCash's XML to Ledger's Dat File
+# GnuCash to Ledger
 
 > A Golang script to convert a GNUCash file into a Ledger file
 
 You can run the `main.go` file to convert GnuCash's uncompressed XML file to a Ledger journal. This
 script was originally written using Perl, but maintaining Perl dependencies is neither fun nor
 something that I am interested in anymore. So, the script has been re-written to Golang; [primarly
-using AI].
+using AI].[^1]
 
 The file formats for [`ledger`] and [`hledger`] are nearly identical; so, the output from this script
 can be used with either program.
@@ -30,6 +30,7 @@ logical.
 
 ``` shell
 # Convert "./TestData/TestBook-GnuCash/TestBook.gnucash" into a Ledger file
+# using the converter script
 
 # Confirm that actual and expected are identical
 $ diff /tmp/actual.dat ./TestData/TestBook-Ledger/TestBook.ledger.dat
@@ -94,6 +95,8 @@ Code in this repository is licensed under MIT.
 Copyright (C) 2020  Siddharth Kannan <mail@siddharthkannan.in>
 
 [1]: https://gist.github.com/nonducor/ddc97e787810d52d067206a592a35ea7
-[primarily using AI]: https://gitlab.com/siddharthkannan-in/open-source/gnucash-xml-to-ledger-dat/-/merge_requests/1/diffs
+[primarily using AI]: ./ai-assisted/sessions/rewrite-in-go
 [`ledger`]: https://ledger-cli.org/
 [`hledger`]: https://hledger.org/index.html
+
+[^1]: OpenCode with Claude Sonnet 4.5
