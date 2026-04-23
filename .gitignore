@@ -2,4 +2,8 @@
 *.ledger
 *.gnucash
 *.xml
+*.db
+input/
+output/
 prices.db
+gnucash-converter

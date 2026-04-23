@@ -1,33 +1,26 @@
-# GNUCash's XML to Ledger's Dat File
+# GnuCash to Ledger
 
-> A script to convert GNUCash's XML file to Ledger's dat file
+> A Golang script to convert a GNUCash file into a Ledger file
 
-[convert.pl](./convert.pl) is the script to convert GnuCash's uncompressed XML
-file to a Ledger journal. I run it using Perl 5.26 on a computer running Ubuntu
-18.04.
+You can run the `main.go` file to convert GnuCash's uncompressed XML file to a Ledger journal. This
+script was originally written using Perl, but maintaining Perl dependencies is neither fun nor
+something that I am interested in anymore. So, the script has been re-written to Golang; [primarly
+using AI].[^1]
 
-The file formats for ledger and hledger are very similar, I have been able to
-generate repors using hledger for the dat file created by the conversion script.
-
-**Note:** There are [other scripts][1] which do the same thing as the Perl
-script in this repository.
+The file formats for [`ledger`] and [`hledger`] are nearly identical; so, the output from this script
+can be used with either program.
 
 ## Usage
 
-`convert.pl` requires the Perl module `XML::Simple` as a dependency. This script can be run without
-installing anything using Docker:
+``` shell
+# Decompress the GnuCash file and write to an input XML file
+zcat input.gnucash > input.xml
 
-``` sh
-# Build the Docker image using the included Dockerfile
-$ docker build . -t $(basename $(pwd))
+# Use this script to convert the input into a Ledger file
+go run main.go input.xml output.dat
 
-# Use the built Docker image to run the conversion command
-$ docker run --name 'gnucash-xml-to-ledger-dat' \
-  -it --rm \
-  --user 1000:1000 \
-  --volume "$GNUCASH_FILE:/input.gnucash:ro" \
-  --volume /tmp:/output:rw \
-  -w /src $(basename $(pwd)) /input.gnucash /output/output.dat
+# Confirm that the output is valid
+hledger -f output.dat bal
 ```
 
 ## Testing
@@ -37,6 +30,7 @@ logical.
 
 ``` shell
 # Convert "./TestData/TestBook-GnuCash/TestBook.gnucash" into a Ledger file
+# using the converter script
 
 # Confirm that actual and expected are identical
 $ diff /tmp/actual.dat ./TestData/TestBook-Ledger/TestBook.ledger.dat
@@ -47,9 +41,10 @@ $ diff /tmp/actual.dat ./TestData/TestBook-Ledger/TestBook.ledger.dat
 
 ### Don't install anything
 
-These oneliners will run Ledger with a read-only file system connected to the
-current working directory. The read-only file system ensures that the container
-can not change any of the files that are in the current working directory.
+These oneliners will run Ledger with a read-only file system connected to the current working
+directory. The read-only file system ensures that the container can not change any of the files that
+are in the current working directory. This might be useful to you if you store the GnuCash and
+Ledger files in the same directory.
 
 ```sh
 hledger () {
@@ -100,3 +95,8 @@ Code in this repository is licensed under MIT.
 Copyright (C) 2020  Siddharth Kannan <mail@siddharthkannan.in>
 
 [1]: https://gist.github.com/nonducor/ddc97e787810d52d067206a592a35ea7
+[primarily using AI]: ./ai-assisted/sessions/rewrite-in-go
+[`ledger`]: https://ledger-cli.org/
+[`hledger`]: https://hledger.org/index.html
+
+[^1]: OpenCode with Claude Sonnet 4.5
