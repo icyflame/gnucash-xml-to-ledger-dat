@@ -4,7 +4,7 @@
 
 You can run the `main.go` file to convert GnuCash's uncompressed XML file to a Ledger journal. This
 script was originally written using Perl, but maintaining Perl dependencies is neither fun nor
-something that I am interested in anymore. So, the script has been re-written to Golang; [primarly
+something that I am interested in anymore. So, the script has been re-written to Golang; [primarily
 using AI].[^1]
 
 The file formats for [`ledger`] and [`hledger`] are nearly identical; so, the output from this script
