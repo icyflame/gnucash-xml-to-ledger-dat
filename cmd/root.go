@@ -11,6 +11,7 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(gnucashToLedgerCmd)
+	rootCmd.AddCommand(prestiaToLedgerCmd)
 }
 
 func Execute() error {
