@@ -17,7 +17,7 @@ can be used with either program.
 zcat input.gnucash > input.xml
 
 # Use this script to convert the input into a Ledger file
-go run main.go input.xml output.dat
+go run main.go gnucash-to-ledger input.xml output.dat
 
 # Confirm that the output is valid
 hledger -f output.dat bal
@@ -31,13 +31,14 @@ logical.
 ``` shell
 # Convert "./TestData/TestBook-GnuCash/TestBook.gnucash" into a Ledger file
 # using the converter script
-$ zcat TestData/TestBook-GnuCash/TestBook.gnucash | go run main.go - > /tmp/converted.dat
+$ zcat TestData/TestBook-GnuCash/TestBook.gnucash | go run main.go gnucash-to-ledger - > /tmp/converted.dat
 
 # Confirm that actual and expected are identical
 $ diff ./TestData/TestBook-Ledger/TestBook.ledger.dat /tmp/converted.dat
 
 # Oneliner:
-$ diff TestData/TestBook-Ledger/TestBook.ledger.dat <(zcat TestData/TestBook-GnuCash/TestBook.gnucash | go run main.go -)
+$ diff TestData/TestBook-Ledger/TestBook.ledger.dat <(zcat TestData/TestBook-GnuCash/TestBook.gnucash | go run main.go gnucash-to-ledger -)
+
 ```
 
 ## Recipes
