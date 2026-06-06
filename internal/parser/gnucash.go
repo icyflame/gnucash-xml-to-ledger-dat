@@ -3,6 +3,7 @@ package parser
 import (
 	"encoding/xml"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -61,9 +62,17 @@ func New() *Parser {
 }
 
 func (p *Parser) Parse(filename string) error {
-	data, err := os.ReadFile(filename)
+	var data []byte
+	var err error
+
+	if filename == "-" {
+		data, err = io.ReadAll(os.Stdin)
+	} else {
+		data, err = os.ReadFile(filename)
+	}
+
 	if err != nil {
-		return fmt.Errorf("failed to read file: %w", err)
+		return fmt.Errorf("failed to read input: %w", err)
 	}
 
 	p.file = &GnuCashFile{}
