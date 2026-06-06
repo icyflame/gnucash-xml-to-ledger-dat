@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/icyflame/gnucash-xml-to-ledger-dat/internal/parser"
+	"github.com/icyflame/gnucash-xml-to-ledger-dat/lib/parsers/gnucash"
 	"github.com/icyflame/gnucash-xml-to-ledger-dat/internal/writer"
 	"github.com/spf13/cobra"
 )
@@ -35,7 +35,7 @@ func Execute() error {
 func runConvert(cmd *cobra.Command, args []string) error {
 	inputFile := args[0]
 
-	p := parser.New()
+	p := gnucash.New()
 	p.Verbose = verbose
 
 	if err := p.Parse(inputFile); err != nil {

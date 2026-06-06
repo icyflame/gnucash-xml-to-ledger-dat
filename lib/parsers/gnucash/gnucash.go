@@ -1,4 +1,4 @@
-package parser
+package gnucash
 
 import (
 	"encoding/xml"

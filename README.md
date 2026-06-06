@@ -31,10 +31,13 @@ logical.
 ``` shell
 # Convert "./TestData/TestBook-GnuCash/TestBook.gnucash" into a Ledger file
 # using the converter script
+$ zcat TestData/TestBook-GnuCash/TestBook.gnucash | go run main.go - > /tmp/converted.dat
 
 # Confirm that actual and expected are identical
-$ diff /tmp/actual.dat ./TestData/TestBook-Ledger/TestBook.ledger.dat
+$ diff ./TestData/TestBook-Ledger/TestBook.ledger.dat /tmp/converted.dat
 
+# Oneliner:
+$ diff TestData/TestBook-Ledger/TestBook.ledger.dat <(zcat TestData/TestBook-GnuCash/TestBook.gnucash | go run main.go -)
 ```
 
 ## Recipes

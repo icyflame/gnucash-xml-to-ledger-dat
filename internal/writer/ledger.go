@@ -6,15 +6,15 @@ import (
 	"os"
 	"strings"
 
-	"github.com/icyflame/gnucash-xml-to-ledger-dat/internal/parser"
+	"github.com/icyflame/gnucash-xml-to-ledger-dat/lib/parsers/gnucash"
 )
 
 type LedgerWriter struct {
-	parser  *parser.Parser
+	parser  *gnucash.Parser
 	verbose bool
 }
 
-func New(p *parser.Parser, verbose bool) *LedgerWriter {
+func New(p *gnucash.Parser, verbose bool) *LedgerWriter {
 	return &LedgerWriter{
 		parser:  p,
 		verbose: verbose,
@@ -49,10 +49,10 @@ func (w *LedgerWriter) Write(writer io.Writer) error {
 			// too, then this split is a no-op and does not need to be included in the resulting Ledger
 			// file.  However, for correctness, I *will* include the "0 COMMODITY" split in the output
 			// Ledger file.
-			quantity := parser.ParseFraction(split.Quantity)
-			amount := quantity
+		quantity := gnucash.ParseFraction(split.Quantity)
+		amount := quantity
 
-			value := parser.ParseFraction(split.Value)
+		value := gnucash.ParseFraction(split.Value)
 			if w.verbose {
 				fmt.Fprintf(os.Stderr, "%s, %g, %g\n", accountName, quantity, value)
 			}
