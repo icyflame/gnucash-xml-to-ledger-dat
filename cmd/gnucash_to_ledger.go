@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/icyflame/gnucash-xml-to-ledger-dat/internal/writer"
+	"github.com/icyflame/gnucash-xml-to-ledger-dat/internal/transformers"
 	"github.com/icyflame/gnucash-xml-to-ledger-dat/lib/parsers/gnucash"
 	"github.com/spf13/cobra"
 )
@@ -42,7 +42,7 @@ func runConvert(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to parse input file: %w", err)
 	}
 
-	w := writer.New(p, verbose)
+	w := transformers.NewGnuCashLedgerTransformer(p, verbose)
 
 	var output *os.File
 	if len(args) == 2 {
