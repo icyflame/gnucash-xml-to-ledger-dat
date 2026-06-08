@@ -46,7 +46,7 @@ func (t *PrestiaLedgerTransformer) Write(writer io.Writer) error {
 
 		// Write the posting line with the amount
 		commodity := fmt.Sprintf("\"%s\"", PrestiaDefaultCommodity)
-		fmt.Fprintf(writer, "  %s  %s  %g\n", PrestiaDefaultLiabilitiesAccount, commodity, amount)
+		fmt.Fprintf(writer, "  %s  %s  %g\n", PrestiaDefaultLiabilitiesAccount, commodity, -1*amount)
 
 		// Write the counterparty posting
 		fmt.Fprintf(writer, "  %s\n", PrestiaCounterpartyAccount)
