@@ -12,7 +12,7 @@ import (
 // Constants for Prestia to Ledger transformation
 const (
 	PrestiaCounterpartyAccount       = "Expenses"
-	PrestiaDefaultCommodity          = "COMM"
+	PrestiaDefaultCommodity          = "JPY"
 	PrestiaDefaultLiabilitiesAccount = "Liabilities:Prestia Card"
 )
 
