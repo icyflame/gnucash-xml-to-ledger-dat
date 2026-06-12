@@ -18,6 +18,10 @@ func PresentRegisterDiff(w io.Writer, sideABuckets, sideBBuckets []groupers.Buck
 		setA := setABucket.Transactions
 		setB := setBBucket.Transactions
 
+		if max(len(setA), len(setB)) == 0 {
+			continue
+		}
+
 		fmt.Fprintf(w, "\n- === %s === Count: %d\n", setABucket.Name, len(setA))
 		for _, txn := range setA {
 			fmt.Fprintf(w, "- %s | %s | %s | %s\n", txn.Date, txn.Amount, txn.Account, txn.Description)

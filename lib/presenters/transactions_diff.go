@@ -17,6 +17,11 @@ func PresentTransactionsDiffAsTSV(w *csv.Writer, sideABuckets, sideBBuckets []gr
 		sideA := sideABuckets[bucketCount]
 		sideB := sideBBuckets[bucketCount]
 
+		rowCount := max(len(sideB.Transactions), len(sideA.Transactions))
+		if rowCount == 0 {
+			continue
+		}
+
 		w.Write([]string{
 			sideA.Name, "", "", "",
 			"",
@@ -35,7 +40,7 @@ func PresentTransactionsDiffAsTSV(w *csv.Writer, sideABuckets, sideBBuckets []gr
 			"Date", "Amount", "Account", "Description",
 		})
 
-		for i := range max(len(sideB.Transactions), len(sideA.Transactions)) {
+		for i := range rowCount {
 			var row []string
 
 			var left, right *ledger.RegisterTransaction
