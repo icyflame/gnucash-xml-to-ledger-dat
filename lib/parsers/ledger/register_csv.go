@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"regexp"
 	"slices"
 )
 
@@ -86,4 +87,47 @@ func (p *RegisterCSVParser) GetTransactions() []RegisterTransaction {
 func isValidHeader(header []string) bool {
 	expectedHeader := []string{"txnidx", "date", "code", "description", "account", "amount", "total"}
 	return slices.Equal(header, expectedHeader)
+}
+
+// BuildTransactionMap creates a map with key "YYYY-MM-DD-AMOUNT" for each transaction.
+// The amount is extracted without the commodity (numeric value and sign only).
+// Multiple transactions with the same key are stored as a slice.
+func (p *RegisterCSVParser) BuildTransactionMap() map[string][]RegisterTransaction {
+	return buildTransactionMapFromSlice(p.transactions)
+}
+
+// buildTransactionMapFromSlice is a helper function that builds a transaction map from a slice.
+// This is used by both the parser and can be used independently for creating maps from transaction slices.
+func buildTransactionMapFromSlice(transactions []RegisterTransaction) map[string][]RegisterTransaction {
+	txnMap := make(map[string][]RegisterTransaction)
+
+	for _, txn := range transactions {
+		key := extractTransactionKey(txn)
+		txnMap[key] = append(txnMap[key], txn)
+	}
+
+	return txnMap
+}
+
+// extractTransactionKey extracts the numeric amount from the Amount field and creates a key
+// in the format "YYYY-MM-DD-AMOUNT". The amount includes the sign (+ or -) but no commodity.
+func extractTransactionKey(txn RegisterTransaction) string {
+	// Amount format: "INR -3500" or "INR 50000"
+	// Extract the numeric value with sign
+	amount := extractAmountValue(txn.Amount)
+	return fmt.Sprintf("%s-%s", txn.Date, amount)
+}
+
+// extractAmountValue extracts the numeric amount with sign from a string like "INR -3500".
+// Returns just the numeric part with sign, e.g., "-3500" or "50000".
+func extractAmountValue(amountStr string) string {
+	// Use regex to extract the numeric value (with optional sign)
+	re := regexp.MustCompile(`(-?\d+(?:\.\d+)?)`)
+	matches := re.FindStringSubmatch(amountStr)
+
+	if len(matches) > 0 {
+		return matches[1]
+	}
+
+	return amountStr // Fallback to original if no match
 }
