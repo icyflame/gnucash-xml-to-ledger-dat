@@ -98,8 +98,7 @@ func runDiffLedgerRegister(cmd *cobra.Command, args []string) error {
 		// TODO: Implement logic to break up the transactions in diffAminusB and diffBminusA into a
 		// slice of slices, where each slice contains transactions from a given week
 	case "monthly":
-		// TODO: Implement logic to break up the transactions in diffAminusB and diffBminusA into a
-		// slice of slices, where each slice contains transactions from a given month
+		sideA, sideB = groupers.Monthly(diffAminusB, diffBminusA)
 	default:
 		sideA = []groupers.Bucket{
 			{

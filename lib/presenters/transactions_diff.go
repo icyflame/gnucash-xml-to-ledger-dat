@@ -18,9 +18,9 @@ func PresentTransactionsDiffAsTSV(w *csv.Writer, sideABuckets, sideBBuckets []gr
 		sideB := sideBBuckets[bucketCount]
 
 		w.Write([]string{
-			"", "", "", sideA.Name,
+			sideA.Name, "", "", "",
 			"",
-			"", "", "", sideB.Name,
+			sideB.Name, "", "", "",
 		})
 
 		w.Write([]string{
@@ -63,5 +63,11 @@ func PresentTransactionsDiffAsTSV(w *csv.Writer, sideABuckets, sideBBuckets []gr
 
 			w.Write(row)
 		}
+
+		w.Write([]string{
+			"", "", "", "",
+			"",
+			"", "", "", "",
+		})
 	}
 }
