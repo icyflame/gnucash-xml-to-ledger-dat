@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/csv"
 	"fmt"
+	"log/slog"
 	"os"
 	"sort"
 
@@ -53,8 +54,8 @@ func runDiffLedgerRegister(cmd *cobra.Command, args []string) error {
 	transactions1 := parser1.GetTransactions()
 	transactions2 := parser2.GetTransactions()
 
-	fmt.Printf("Parsed %d transactions from %s\n", len(transactions1), csvFile1)
-	fmt.Printf("Parsed %d transactions from %s\n", len(transactions2), csvFile2)
+	slog.Info("parsed transactions", slog.Int("count", len(transactions1)), slog.String("file", csvFile1))
+	slog.Info("parsed transactions", slog.Int("count", len(transactions2)), slog.String("file", csvFile2))
 
 	// Stage 2: Implement diff logic: Diff should consider the two sides of ledger transactions as Set A and Set B.
 	//
@@ -75,24 +76,14 @@ func runDiffLedgerRegister(cmd *cobra.Command, args []string) error {
 	sort.Sort(ledger.RegisterTransactionSlice(diffAminusB))
 	sort.Sort(ledger.RegisterTransactionSlice(diffBminusA))
 
-	fmt.Println("\n=== Transactions in File 1 but not in File 2 ===", "Count: ", len(diffAminusB))
-	for _, txn := range diffAminusB {
-		fmt.Printf("%s | %s | %s | %s\n", txn.Date, txn.Amount, txn.Account, txn.Description)
-	}
-
-	fmt.Println("\n=== Transactions in File 2 but not in File 1 ===", "Count: ", len(diffBminusA))
-	for _, txn := range diffBminusA {
-		fmt.Printf("%s | %s | %s | %s\n", txn.Date, txn.Amount, txn.Account, txn.Description)
-	}
-
-	fmt.Println("\n=== Output as TSV:")
+	presenters.PresentRegisterDiff(os.Stdout, diffAminusB, diffBminusA)
 
 	w := csv.NewWriter(os.Stdout)
 	// Use tabs as separator to avoid having to deal with double quotes wrapping and such
 	w.Comma = '\t'
 	defer w.Flush()
 
-	presenters.PresentTransactionsAsDiff(w, diffAminusB, diffBminusA)
+	presenters.PresentTransactionsDiffAsTSV(w, diffAminusB, diffBminusA)
 
 	return nil
 }

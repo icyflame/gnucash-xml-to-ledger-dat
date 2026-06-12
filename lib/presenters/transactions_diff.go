@@ -6,7 +6,7 @@ import (
 	"github.com/icyflame/gnucash-xml-to-ledger-dat/lib/parsers/ledger"
 )
 
-func PresentTransactionsAsDiff(w *csv.Writer, sideA, sideB []ledger.RegisterTransaction) {
+func PresentTransactionsDiffAsTSV(w *csv.Writer, sideA, sideB []ledger.RegisterTransaction) {
 	for i := range max(len(sideB), len(sideA)) {
 		var row []string
 
