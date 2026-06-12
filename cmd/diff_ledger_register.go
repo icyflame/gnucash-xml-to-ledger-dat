@@ -88,6 +88,14 @@ func runDiffLedgerRegister(cmd *cobra.Command, args []string) error {
 	diffAminusB := subtractor.Subtract(parser1Map, parser2Map)
 	diffBminusA := subtractor.Subtract(parser2Map, parser1Map)
 
+	slog.Info("summary counts",
+		slog.Int("A-side", len(transactions1)),
+		slog.Int("B-side", len(transactions2)),
+		slog.Int("A-B", len(diffAminusB)),
+		slog.Int("B-A", len(diffBminusA)),
+		slog.Int("AintersectionB", (len(transactions1)+len(transactions2)-len(diffAminusB)-len(diffBminusA))/2),
+	)
+
 	sort.Sort(ledger.RegisterTransactionSlice(diffAminusB))
 	sort.Sort(ledger.RegisterTransactionSlice(diffBminusA))
 
