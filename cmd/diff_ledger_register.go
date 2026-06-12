@@ -61,22 +61,17 @@ func runDiffLedgerRegister(cmd *cobra.Command, args []string) error {
 	// The key for each element in the Set should be "YYYY-MM-DD-AMOUNT" => Note that commodity is
 	// not considered here. Retain the sign for + and - amount.
 
-	// Build maps with key "YYYY-MM-DD-AMOUNT" for set operations
 	parser1Map := parser1.BuildTransactionMap()
 	parser2Map := parser2.BuildTransactionMap()
 
-	// Create a subtractor instance for set differences
 	subtractor := subtractors.New()
 
-	// Compute set differences: A-B and B-A
 	diffAminusB := subtractor.Subtract(parser1Map, parser2Map)
 	diffBminusA := subtractor.Subtract(parser2Map, parser1Map)
 
-	// Sort the differences for consistent output
 	sort.Sort(ledger.RegisterTransactionSlice(diffAminusB))
 	sort.Sort(ledger.RegisterTransactionSlice(diffBminusA))
 
-	// Output results
 	fmt.Println("\n=== Transactions in File 1 but not in File 2 ===", "Count: ", len(diffAminusB))
 	for _, txn := range diffAminusB {
 		fmt.Printf("%s | %s | %s | %s\n", txn.Date, txn.Amount, txn.Account, txn.Description)
