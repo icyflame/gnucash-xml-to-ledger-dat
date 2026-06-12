@@ -1,10 +1,13 @@
 package cmd
 
 import (
+	"encoding/csv"
 	"fmt"
+	"os"
 	"sort"
 
 	"github.com/icyflame/gnucash-xml-to-ledger-dat/lib/parsers/ledger"
+	"github.com/icyflame/gnucash-xml-to-ledger-dat/lib/presenters"
 	"github.com/icyflame/gnucash-xml-to-ledger-dat/lib/subtractors"
 	"github.com/spf13/cobra"
 )
@@ -81,6 +84,15 @@ func runDiffLedgerRegister(cmd *cobra.Command, args []string) error {
 	for _, txn := range diffBminusA {
 		fmt.Printf("%s | %s | %s | %s\n", txn.Date, txn.Amount, txn.Account, txn.Description)
 	}
+
+	fmt.Println("\n=== Output as TSV:")
+
+	w := csv.NewWriter(os.Stdout)
+	// Use tabs as separator to avoid having to deal with double quotes wrapping and such
+	w.Comma = '\t'
+	defer w.Flush()
+
+	presenters.PresentTransactionsAsDiff(w, diffAminusB, diffBminusA)
 
 	return nil
 }
