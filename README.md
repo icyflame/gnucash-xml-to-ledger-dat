@@ -1,16 +1,19 @@
-# GnuCash to Ledger
+# Personal Finance Transformer
 
-> A Golang script to convert a GNUCash file into a Ledger file
+> A Cobra CLI to transform various personal finance file types (GnuCash, Ledger format, credit card
+> statement CSV files)
 
-You can run the `main.go` file to convert GnuCash's uncompressed XML file to a Ledger journal. This
-script was originally written using Perl, but maintaining Perl dependencies is neither fun nor
-something that I am interested in anymore. So, the script has been re-written to Golang; [primarily
-using AI].[^1]
+You can run subcommands within the `main.go` file to convert GnuCash's uncompressed XML file to a
+Ledger journal. This script was originally written using Perl, but maintaining Perl dependencies is
+neither fun nor something that I am interested in anymore. So, the script has been re-written to
+Golang; [primarily using AI].[^1]
 
-The file formats for [`ledger`] and [`hledger`] are nearly identical; so, the output from this script
-can be used with either program.
+The file formats for [`ledger`] and [`hledger`] are nearly identical. So, the output from this
+script can be used with either program.
 
 ## Usage
+
+### GnuCash to Ledger
 
 ``` shell
 # Decompress the GnuCash file and write to an input XML file
@@ -22,6 +25,60 @@ go run main.go gnucash-to-ledger input.xml output.dat
 # Confirm that the output is valid
 hledger -f output.dat bal
 ```
+
+### Prestia to Ledger
+
+``` sh
+$ cat ./TestData/TestBook-Prestia/202509.csv ./TestData/TestBook-Prestia/202510.csv | go run main.go prestia-to-ledger -  | head -10
+2026/06/12 12:40:25 WARN invalid line in Prestia statement > number of fields mismatch, want 7 num_fields=3 fields="[ジョナサン\u3000太郎\u3000様 1234-00**-****-**** プレスティアＶｉｓａゴールド]"
+2026/06/12 12:40:25 WARN invalid line in Prestia statement > number of fields mismatch, want 7 num_fields=3 fields="[エリザベス\u3000太郎\u3000様 1235-11**-****-**** ＧｏｏｇｌｅＰａｙ／ｉＤ]"
+2026/06/12 12:40:25 WARN invalid line in Prestia statement > first field is not a date in YYYY/MM/DD format first_field="" parse_error="parsing time \"\" as \"2006/01/02\": cannot parse \"\" as \"2006\""
+2026/06/12 12:40:25 WARN invalid line in Prestia statement > number of fields mismatch, want 7 num_fields=3 fields="[ジョナサン\u3000太郎\u3000様 1234-00**-****-**** プレスティアＶｉｓａゴールド]"
+2026/06/12 12:40:25 WARN invalid line in Prestia statement > number of fields mismatch, want 7 num_fields=3 fields="[エリザベス\u3000太郎\u3000様 1235-11**-****-**** ＧｏｏｇｌｅＰａｙ／ｉＤ]"
+2026/06/12 12:40:25 WARN invalid line in Prestia statement > first field is not a date in YYYY/MM/DD format first_field="" parse_error="parsing time \"\" as \"2006/01/02\": cannot parse \"\" as \"2006\""
+2025-08-20  飲食店
+  Liabilities:Prestia Card  "JPY"  -600
+  Expenses
+
+2025-08-25  飲食店
+  Liabilities:Prestia Card  "JPY"  -750
+  Expenses
+
+2025-09-04  飲食店
+  Liabilities:Prestia Card  "JPY"  -900
+
+```
+
+### Diff Ledger Registers
+
+``` sh
+$ go run main.go diff-ledger register \
+    <(dock_hledger -f ./TestData/TestBook-Prestia/prestia-statement-jpy.dat register --begin 2025-08 --end 2025-08-31 'Liabilities' -O csv | head -n10) \
+    <(dock_hledger -f ./TestData/TestBook-Ledger/TestBook.ledger.dat register --begin 2025-08-01 --end 2025-08-31 'Liabilities' -O csv | head -n10)
+Error: currency mismatch between file 1 and file 2: file 1 currency: JPY, file 2 currency: INR
+Usage:
+  personal-finance-transformer diff-ledger register <csv-file-1> <csv-file-2> [flags]
+
+Flags:
+  -h, --help   help for register
+
+exit status 1
+
+$ go run main.go diff-ledger register \
+    <(dock_hledger -f ./TestData/TestBook-Prestia/prestia-statement-inr.dat register --begin 2025-08 --end 2025-08-31 'Liabilities' -O csv | head -n10) \
+    <(dock_hledger -f ./TestData/TestBook-Ledger/TestBook.ledger.dat register --begin 2025-08-01 --end 2025-08-31 'Liabilities' -O csv | head -n10)
+Parsed 3 transactions from /proc/self/fd/11
+Parsed 6 transactions from /proc/self/fd/12
+
+=== Transactions in File 1 but not in File 2 === Count:  0
+
+=== Transactions in File 2 but not in File 1 === Count:  3
+2025-08-02 | INR -3500 | Liabilities:Credit Card | Groceries
+2025-08-20 | INR -750 | Liabilities:Credit Card | Electricity
+2025-08-25 | INR -800 | Liabilities:Credit Card | T-shirts
+
+```
+
 
 ## Testing
 
