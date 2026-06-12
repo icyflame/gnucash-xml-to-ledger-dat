@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/icyflame/gnucash-xml-to-ledger-dat/lib/parsers/ledger"
 	"github.com/icyflame/gnucash-xml-to-ledger-dat/lib/subtractors"
@@ -71,19 +72,19 @@ func runDiffLedgerRegister(cmd *cobra.Command, args []string) error {
 	diffAminusB := subtractor.Subtract(parser1Map, parser2Map)
 	diffBminusA := subtractor.Subtract(parser2Map, parser1Map)
 
+	// Sort the differences for consistent output
+	sort.Sort(ledger.RegisterTransactionSlice(diffAminusB))
+	sort.Sort(ledger.RegisterTransactionSlice(diffBminusA))
+
 	// Output results
-	fmt.Println("\n=== Transactions in File 1 but not in File 2 ===")
-	for key, txns := range diffAminusB {
-		for _, txn := range txns {
-			fmt.Printf("%s | %s | %s\n", key, txn.Account, txn.Description)
-		}
+	fmt.Println("\n=== Transactions in File 1 but not in File 2 ===", "Count: ", len(diffAminusB))
+	for _, txn := range diffAminusB {
+		fmt.Printf("%s | %s | %s | %s\n", txn.Date, txn.Amount, txn.Account, txn.Description)
 	}
 
-	fmt.Println("\n=== Transactions in File 2 but not in File 1 ===")
-	for key, txns := range diffBminusA {
-		for _, txn := range txns {
-			fmt.Printf("%s | %s | %s\n", key, txn.Account, txn.Description)
-		}
+	fmt.Println("\n=== Transactions in File 2 but not in File 1 ===", "Count: ", len(diffBminusA))
+	for _, txn := range diffBminusA {
+		fmt.Printf("%s | %s | %s | %s\n", txn.Date, txn.Amount, txn.Account, txn.Description)
 	}
 
 	return nil

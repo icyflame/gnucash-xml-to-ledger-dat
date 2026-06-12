@@ -142,6 +142,32 @@ func extractAmountValue(amountStr string) string {
 
 	return amountStr // Fallback to original if no match
 }
+
+// RegisterTransactionSlice implements sort.Interface for []RegisterTransaction.
+// It sorts by Date, then Amount, then Description.
+type RegisterTransactionSlice []RegisterTransaction
+
+// Len returns the length of the slice.
+func (s RegisterTransactionSlice) Len() int {
+	return len(s)
+}
+
+// Less compares two transactions: first by Date, then by Amount, then by Description.
+func (s RegisterTransactionSlice) Less(i, j int) bool {
+	if s[i].Date != s[j].Date {
+		return s[i].Date < s[j].Date
+	}
+	if s[i].Amount != s[j].Amount {
+		return s[i].Amount < s[j].Amount
+	}
+	return s[i].Description < s[j].Description
+}
+
+// Swap exchanges two transactions in the slice.
+func (s RegisterTransactionSlice) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
 // extractCurrency extracts the currency code from an amount string.
 // Amount format: "INR -3500" or "JPY 50000"
 // Returns the currency code (e.g., "INR", "JPY") or an empty string if not found.
