@@ -4,17 +4,28 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/icyflame/gnucash-xml-to-ledger-dat/lib/parsers/ledger"
+	"github.com/icyflame/gnucash-xml-to-ledger-dat/lib/groupers"
 )
 
-func PresentRegisterDiff(w io.Writer, setA, setB []ledger.RegisterTransaction) {
-	fmt.Fprintln(w, "\n- === Transactions in File 1 but not in File 2 ===", "Count: ", len(setA))
-	for _, txn := range setA {
-		fmt.Fprintf(w, "- %s | %s | %s | %s\n", txn.Date, txn.Amount, txn.Account, txn.Description)
+func PresentRegisterDiff(w io.Writer, sideABuckets, sideBBuckets []groupers.Bucket) {
+	if len(sideABuckets) != len(sideBBuckets) {
+		panic(fmt.Sprintf("logic error: sideA (%d) and sideB (%d) must be of the same size", len(sideABuckets), len(sideBBuckets)))
 	}
 
-	fmt.Fprintln(w, "\n+ === Transactions in File 2 but not in File 1 ===", "Count: ", len(setB))
-	for _, txn := range setB {
-		fmt.Fprintf(w, "+ %s | %s | %s | %s\n", txn.Date, txn.Amount, txn.Account, txn.Description)
+	for i := range len(sideABuckets) {
+		setABucket := sideABuckets[i]
+		setBBucket := sideBBuckets[i]
+		setA := setABucket.Transactions
+		setB := setBBucket.Transactions
+
+		fmt.Fprintf(w, "\n- === %s === Count: %d\n", setABucket.Name, len(setA))
+		for _, txn := range setA {
+			fmt.Fprintf(w, "- %s | %s | %s | %s\n", txn.Date, txn.Amount, txn.Account, txn.Description)
+		}
+
+		fmt.Fprintf(w, "\n- === %s === Count: %d\n", setBBucket.Name, len(setB))
+		for _, txn := range setB {
+			fmt.Fprintf(w, "+ %s | %s | %s | %s\n", txn.Date, txn.Amount, txn.Account, txn.Description)
+		}
 	}
 }
