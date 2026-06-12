@@ -42,6 +42,10 @@ func runDiffLedgerRegister(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to parse second CSV file: %w", err)
 	}
 
+	if parser1.GetCurrency() != parser2.GetCurrency() {
+		return fmt.Errorf("currency mismatch between file 1 and file 2: file 1 currency: %s, file 2 currency: %s", parser1.GetCurrency(), parser2.GetCurrency())
+	}
+
 	transactions1 := parser1.GetTransactions()
 	transactions2 := parser2.GetTransactions()
 

@@ -22,6 +22,7 @@ type RegisterTransaction struct {
 // RegisterCSVParser parses a Ledger register CSV file.
 type RegisterCSVParser struct {
 	transactions []RegisterTransaction
+	currency     string // Currency of all transactions (must be consistent)
 }
 
 // New creates a new RegisterCSVParser.
@@ -54,14 +55,12 @@ func (p *RegisterCSVParser) Parse(filePath string) error {
 		return fmt.Errorf("invalid CSV header: expected [txnidx, date, code, description, account, amount, total], got %v", header)
 	}
 
-	// Read all records
 	records, err := reader.ReadAll()
 	if err != nil {
 		return fmt.Errorf("failed to read CSV records: %w", err)
 	}
 
-	// Parse records into RegisterTransaction objects
-	for _, record := range records {
+	for i, record := range records {
 		txn := RegisterTransaction{
 			TxnIdx:      record[0],
 			Date:        record[1],
@@ -72,15 +71,27 @@ func (p *RegisterCSVParser) Parse(filePath string) error {
 			Total:       record[6],
 		}
 
+		// Extract and validate currency
+		currency := extractCurrency(txn.Amount)
+		if p.currency == "" {
+			p.currency = currency
+		} else if p.currency != currency {
+			return fmt.Errorf("currency mismatch at line %d: expected %s, got %s", i+2, p.currency, currency)
+		}
+
 		p.transactions = append(p.transactions, txn)
 	}
 
 	return nil
 }
 
-// GetTransactions returns the parsed transactions.
 func (p *RegisterCSVParser) GetTransactions() []RegisterTransaction {
 	return p.transactions
+}
+
+// GetCurrency returns the currency of all transactions in this file.
+func (p *RegisterCSVParser) GetCurrency() string {
+	return p.currency
 }
 
 // isValidHeader validates that the CSV header matches the expected format.
@@ -130,4 +141,18 @@ func extractAmountValue(amountStr string) string {
 	}
 
 	return amountStr // Fallback to original if no match
+}
+// extractCurrency extracts the currency code from an amount string.
+// Amount format: "INR -3500" or "JPY 50000"
+// Returns the currency code (e.g., "INR", "JPY") or an empty string if not found.
+func extractCurrency(amountStr string) string {
+	// Use regex to extract the currency code (uppercase letters at the start)
+	re := regexp.MustCompile(`^([A-Z]+)\s`)
+	matches := re.FindStringSubmatch(amountStr)
+
+	if len(matches) > 1 {
+		return matches[1]
+	}
+
+	return ""
 }
