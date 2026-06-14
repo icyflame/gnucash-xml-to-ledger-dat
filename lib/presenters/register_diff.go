@@ -27,7 +27,7 @@ func PresentRegisterDiff(w io.Writer, sideABuckets, sideBBuckets []groupers.Buck
 			fmt.Fprintf(w, "- %s | %s | %s | %s\n", txn.Date, txn.Amount, txn.Account, txn.Description)
 		}
 
-		fmt.Fprintf(w, "\n- === %s === Count: %d\n", setBBucket.Name, len(setB))
+		fmt.Fprintf(w, "\n+ === %s === Count: %d\n", setBBucket.Name, len(setB))
 		for _, txn := range setB {
 			fmt.Fprintf(w, "+ %s | %s | %s | %s\n", txn.Date, txn.Amount, txn.Account, txn.Description)
 		}
