@@ -71,6 +71,10 @@ func (p *RegisterCSVParser) Parse(filePath string) error {
 			Total:       record[6],
 		}
 
+		if txn.Amount == "0" {
+			continue
+		}
+
 		// Extract and validate currency
 		currency := extractCurrency(txn.Amount)
 		if p.currency == "" {

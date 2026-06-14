@@ -1,6 +1,7 @@
 package subtractors
 
 import (
+	"log/slog"
 	"sort"
 
 	"github.com/icyflame/gnucash-xml-to-ledger-dat/lib/parsers/ledger"
@@ -18,6 +19,8 @@ func New() *RegisterSubtractor {
 func (rs *RegisterSubtractor) Subtract(setA, setB map[string][]ledger.RegisterTransaction) []ledger.RegisterTransaction {
 	var diff []ledger.RegisterTransaction
 
+	var commonTransactions int
+
 	for key, txnsA := range setA {
 		txnsB, exists := setB[key]
 
@@ -33,8 +36,13 @@ func (rs *RegisterSubtractor) Subtract(setA, setB map[string][]ledger.RegisterTr
 
 		if !rs.allAmountsMatch(txnsA, txnsB) {
 			diff = append(diff, txnsA...)
+			continue
 		}
+
+		commonTransactions += len(txnsA)
 	}
+
+	slog.Info("set subtraction count", slog.Int("common", commonTransactions), slog.Int("subtraction", len(diff)))
 
 	return diff
 }

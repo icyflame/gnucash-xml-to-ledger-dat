@@ -51,6 +51,9 @@ $ cat ./TestData/TestBook-Prestia/202509.csv ./TestData/TestBook-Prestia/202510.
 
 ### Diff Ledger Registers
 
+This command prints an error if the two registers have transactions in different currencies, or if
+each register has transactions in more than one currency:
+
 ``` sh
 $ go run main.go diff-ledger register \
     <(dock_hledger -f ./TestData/TestBook-Prestia/prestia-statement-jpy.dat register --begin 2025-08 --end 2025-08-31 'Liabilities' -O csv | head -n10) \
@@ -64,6 +67,11 @@ Flags:
 
 exit status 1
 
+```
+
+The command will print the diff between two Ledger registers which were printed as CSV:
+
+```sh
 $ go run main.go diff-ledger register \
     <(dock_hledger -f ./TestData/TestBook-Prestia/prestia-statement-inr.dat register --begin 2025-08 --end 2025-08-31 'Liabilities' -O csv | head -n10) \
     <(dock_hledger -f ./TestData/TestBook-Ledger/TestBook.ledger.dat register --begin 2025-08-01 --end 2025-08-31 'Liabilities' -O csv | head -n10)
@@ -79,6 +87,26 @@ Parsed 6 transactions from /proc/self/fd/12
 
 ```
 
+There is also a way to present the transaction diffs as a TSV file. This makes it easier to see the
+monthly diff in a Spreadsheet tool:
+
+``` sh
+$ go run main.go diff-ledger register \
+    <(dock_hledger -f ./TestData/TestBook-Prestia/prestia-statement-inr.dat register --begin 2025-10-01 --end 2025-10-31 'Liabilities' -O csv | head -n10) \                                                                                                                  <(dock_hledger -f ./TestData/TestBook-Ledger/TestBook.ledger.dat register --begin 2025-10-01 --end 2025-10-31 'Liabilities' -O csv | head -n10) | sed '1,/=== Output as TSV/ d'
+2025-10-26      INR -410        Liabilities:Credit Card 海外飲食店              2025-10-07      INR -250        Liabilities:Credit Card      Lunch
+                                        2025-10-10      INR -1380       Liabilities:Credit Card Groceries
+                                        2025-10-19      INR -2000       Liabilities:Credit Card Groceries
+                                        2025-10-20      INR -400        Liabilities:Credit Card Electricity
+                                        2025-10-25      INR -400        Liabilities:Credit Card Dinner
+                                        2025-10-26      INR -400        Liabilities:Credit Card Dinner Abroad
+                                        2025-10-28      INR -1900       Liabilities:Credit Card T-shirts
+
+```
+
+The TSV output is hard to read in the terminal. It is easier to see the value of this output format
+in a Spreadsheet application:
+
+![img](./img/2026-06-12-tsv-output-sample.png)
 
 ## Testing
 
